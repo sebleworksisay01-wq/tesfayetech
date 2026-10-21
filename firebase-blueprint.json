@@ -1,0 +1,182 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "fullName": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 150 },
+        "role": { "type": "string", "enum": ["member", "admin"] },
+        "status": { "type": "string", "enum": ["active", "suspended"] },
+        "jobTitle": { "type": "string", "maxLength": 100 },
+        "company": { "type": "string", "maxLength": 100 },
+        "bio": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid", "fullName", "email", "role", "status"]
+    },
+    "AdminRecord": {
+      "title": "AdminRecord",
+      "description": "Trusted admin role registry document",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 150 },
+        "grantedAt": { "type": "string" },
+        "grantedBy": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["uid", "email"]
+    },
+    "Resource": {
+      "title": "Resource",
+      "description": "Technical resources, manuals, software solutions, and guides",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "shortDescription": { "type": "string", "maxLength": 500 },
+        "content": { "type": "string", "maxLength": 50000 },
+        "category": { "type": "string", "maxLength": 50 },
+        "resourceType": { "type": "string", "enum": ["solution", "manual", "guide", "tutorial"] },
+        "tags": { "type": "array" },
+        "fileName": { "type": "string", "maxLength": 200 },
+        "fileType": { "type": "string", "maxLength": 20 },
+        "fileSize": { "type": "string", "maxLength": 50 },
+        "fileUrl": { "type": "string", "maxLength": 1000 },
+        "fileData": { "type": "string", "maxLength": 500000 },
+        "version": { "type": "string", "maxLength": 20 },
+        "author": { "type": "string", "maxLength": 100 },
+        "thumbnailUrl": { "type": "string", "maxLength": 1000 },
+        "visibility": { "type": "string", "enum": ["public", "members_only"] },
+        "status": { "type": "string", "enum": ["published", "draft", "archived"] },
+        "sourceUrl": { "type": "string", "maxLength": 1000 },
+        "license": { "type": "string", "maxLength": 100 },
+        "downloadCount": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["title", "shortDescription", "category", "resourceType", "visibility", "status"]
+    },
+    "UserBookmark": {
+      "title": "UserBookmark",
+      "description": "User bookmarked resources",
+      "type": "object",
+      "properties": {
+        "resourceId": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["resourceId"]
+    },
+    "UserDownload": {
+      "title": "UserDownload",
+      "description": "History of downloaded resources per user",
+      "type": "object",
+      "properties": {
+        "resourceId": { "type": "string", "maxLength": 128 },
+        "resourceTitle": { "type": "string", "maxLength": 200 },
+        "fileName": { "type": "string", "maxLength": 200 },
+        "downloadedAt": { "type": "string" }
+      },
+      "required": ["resourceId", "resourceTitle"]
+    },
+    "SiteSettings": {
+      "title": "SiteSettings",
+      "description": "Configurable multipurpose site branding, navigation modules, and homepage layout",
+      "type": "object",
+      "properties": {
+        "siteTitle": { "type": "string", "maxLength": 100 },
+        "tagline": { "type": "string", "maxLength": 150 },
+        "logoText": { "type": "string", "maxLength": 50 },
+        "logoUrl": { "type": "string", "maxLength": 1000 },
+        "favicon": { "type": "string", "maxLength": 1000 },
+        "primaryColor": { "type": "string", "maxLength": 20 },
+        "secondaryColor": { "type": "string", "maxLength": 20 },
+        "accentColor": { "type": "string", "maxLength": 20 },
+        "footerText": { "type": "string", "maxLength": 500 },
+        "contactEmail": { "type": "string", "maxLength": 150 },
+        "contactPhone": { "type": "string", "maxLength": 50 },
+        "contactLocation": { "type": "string", "maxLength": 150 },
+        "heroHeading": { "type": "string", "maxLength": 200 },
+        "heroSubheading": { "type": "string", "maxLength": 500 },
+        "heroDescription": { "type": "string", "maxLength": 1000 },
+        "heroPrimaryBtnText": { "type": "string", "maxLength": 50 },
+        "heroPrimaryBtnPath": { "type": "string", "maxLength": 100 },
+        "heroSecondaryBtnText": { "type": "string", "maxLength": 50 },
+        "heroSecondaryBtnPath": { "type": "string", "maxLength": 100 },
+        "modules": { "type": "array" },
+        "stats": { "type": "array" },
+        "testimonials": { "type": "array" },
+        "services": { "type": "array" },
+        "categories": { "type": "array" },
+        "featuredResourceIds": { "type": "array" },
+        "updatedAt": { "type": "string" }
+      }
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Administrative action logs",
+      "type": "object",
+      "properties": {
+        "action": { "type": "string", "maxLength": 100 },
+        "targetType": { "type": "string", "maxLength": 50 },
+        "targetId": { "type": "string", "maxLength": 128 },
+        "details": { "type": "string", "maxLength": 1000 },
+        "performedBy": { "type": "string", "maxLength": 150 },
+        "performedByUid": { "type": "string", "maxLength": 128 },
+        "performedAt": { "type": "string" }
+      },
+      "required": ["action", "performedBy", "performedAt"]
+    },
+    "ContactMessage": {
+      "title": "ContactMessage",
+      "description": "User contact inquiries",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 150 },
+        "subject": { "type": "string", "maxLength": 200 },
+        "message": { "type": "string", "maxLength": 3000 },
+        "status": { "type": "string", "enum": ["unread", "replied", "archived"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["name", "email", "subject", "message"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Private member profiles, readable and updatable only by the owner or admin"
+    },
+    "/users/{userId}/bookmarks/{bookmarkId}": {
+      "schema": "UserBookmark",
+      "description": "Private member bookmarks"
+    },
+    "/users/{userId}/downloads/{downloadId}": {
+      "schema": "UserDownload",
+      "description": "Private member download logs"
+    },
+    "/admins/{userId}": {
+      "schema": "AdminRecord",
+      "description": "Trusted admin registry document"
+    },
+    "/resources/{resourceId}": {
+      "schema": "Resource",
+      "description": "Public and member-only technical resources"
+    },
+    "/site_settings/{settingId}": {
+      "schema": "SiteSettings",
+      "description": "Site global branding and configuration"
+    },
+    "/audit_logs/{logId}": {
+      "schema": "AuditLog",
+      "description": "Security audit records for administrative activities"
+    },
+    "/contact_messages/{messageId}": {
+      "schema": "ContactMessage",
+      "description": "Inquiries submitted via contact form"
+    }
+  }
+}

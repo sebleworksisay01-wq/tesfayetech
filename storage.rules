@@ -1,0 +1,43 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Default deny
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isVerified() && request.auth.token.email == 'sebleworksisay01@gmail.com';
+    }
+
+    // Public resource attachments and thumbnails
+    match /resources/public/{resourceId}/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin() &&
+                   request.resource.size < 50 * 1024 * 1024; // 50MB limit
+    }
+
+    // Protected members-only files (PDFs, DOCX, XLSX, ZIP, TXT, scripts)
+    match /resources/protected/{resourceId}/{fileName} {
+      allow read: if isVerified();
+      allow write: if isAdmin() &&
+                   request.resource.size < 50 * 1024 * 1024;
+    }
+
+    // Member profile avatars
+    match /users/{userId}/avatar/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isVerified() && request.auth.uid == userId &&
+                   request.resource.size < 5 * 1024 * 1024 &&
+                   request.resource.contentType.matches('image/.*');
+    }
+  }
+}

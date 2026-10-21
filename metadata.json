@@ -1,0 +1,6 @@
+{
+  "name": "NexusTech",
+  "description": "Technology, Knowledge, Solutions. Professional multipurpose technology platform for IT experts, consultants, and enterprise knowledge sharing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,160 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Connection test document
+    match /test/{docId} {
+      allow read: if true;
+    }
+
+    // Global hardened primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        ('email' in request.auth.token && request.auth.token.email != null && request.auth.token.email.matches('(?i)^sebleworksisay01@gmail\\.com$'))
+      );
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Entity validation blueprints
+    function isValidUserProfile(data) {
+      return data.uid is string && data.uid == request.auth.uid &&
+             data.fullName is string && data.fullName.size() > 0 && data.fullName.size() <= 100 &&
+             data.role in ['member', 'admin'] &&
+             data.status in ['active', 'suspended'];
+    }
+
+    function isValidResource(data) {
+      return data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.shortDescription is string && data.shortDescription.size() <= 500 &&
+             data.category is string && data.category.size() <= 50 &&
+             data.resourceType in ['solution', 'manual', 'guide', 'tutorial', 'article', 'project'] &&
+             data.visibility in ['public', 'members_only'] &&
+             data.status in ['published', 'draft', 'archived'];
+    }
+
+    // 1. Users collection
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      
+      // User registration / profile initialization:
+      // Users can create their own profile with active status. Role 'admin' is permitted if isAdmin().
+      allow create: if isOwner(userId) &&
+                    isValidUserProfile(incoming()) &&
+                    incoming().status == 'active' &&
+                    (incoming().role == 'member' || isAdmin());
+
+      // Updates: owner can update profile fields, but CANNOT change role or status unless admin
+      allow update: if (
+        (isOwner(userId) &&
+         incoming().uid == userId &&
+         incoming().role == existing().role &&
+         incoming().status == existing().status) ||
+        isAdmin()
+      );
+
+      allow delete: if isAdmin();
+
+      // Subcollection: Bookmarks
+      match /bookmarks/{bookmarkId} {
+        allow get, list: if isOwner(userId);
+        allow create, delete: if isOwner(userId) && (isVerified() || isAdmin());
+      }
+
+      // Subcollection: Downloads
+      match /downloads/{downloadId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && (isVerified() || isAdmin());
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // 2. Admins registry
+    match /admins/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // 3. Resources collection
+    match /resources/{resourceId} {
+      // Public published items can be viewed by anyone; members-only items require verified login or admin
+      allow get: if isValidId(resourceId) && (
+        (resource.data.status == 'published' && (
+          resource.data.visibility == 'public' ||
+          (resource.data.visibility == 'members_only' && (isVerified() || isAdmin()))
+        )) ||
+        isAdmin()
+      );
+
+      // List queries: public or admin or verified members
+      allow list: if resource.data.status == 'published' || isAdmin();
+
+      // Only administrators can create, update content, archive or delete resources
+      allow create: if isValidId(resourceId) && isAdmin() && isValidResource(incoming());
+      
+      // Resource updates: admins can update anything; verified users can only increment downloadCount
+      allow update: if isValidId(resourceId) && (
+        isAdmin() ||
+        (
+          (isVerified() || isAdmin()) &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['downloadCount']) &&
+          incoming().downloadCount is number &&
+          incoming().downloadCount == existing().downloadCount + 1
+        )
+      );
+
+      allow delete: if isValidId(resourceId) && isAdmin();
+    }
+
+    // 4. Site Settings
+    match /site_settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 5. Audit Logs
+    match /audit_logs/{logId} {
+      allow read, create: if isAdmin();
+      allow update, delete: if false; // Append-only audit integrity
+    }
+
+    // 6. Contact Messages
+    match /contact_messages/{messageId} {
+      allow create: if isValidId(messageId) &&
+                    incoming().name is string && incoming().name.size() > 0 && incoming().name.size() <= 100 &&
+                    incoming().email is string && incoming().email.size() > 0 && incoming().email.size() <= 150 &&
+                    incoming().subject is string && incoming().subject.size() > 0 && incoming().subject.size() <= 200 &&
+                    incoming().message is string && incoming().message.size() > 0 && incoming().message.size() <= 3000;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}
