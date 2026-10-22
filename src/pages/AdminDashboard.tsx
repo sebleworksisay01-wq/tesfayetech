@@ -200,11 +200,11 @@ export function AdminDashboard({
           fileSize: editingResource.fileSize || '1.0 MB',
           fileData: editingResource.fileData || '',
           version: editingResource.version || '1.0.0',
-          author: editingResource.author || userProfile?.fullName || 'NexusTech Expert',
+          author: editingResource.author || userProfile?.fullName || 'TesfayeTech Expert',
           visibility: editingResource.visibility || 'public',
           status: editingResource.status || 'published',
           sourceUrl: editingResource.sourceUrl || '',
-          license: editingResource.license || 'NexusTech Enterprise License',
+          license: editingResource.license || 'TesfayeTech Enterprise License',
           downloadCount: editingResource.downloadCount || 0,
           createdAt: editingResource.createdAt || new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -295,7 +295,7 @@ export function AdminDashboard({
     setModalState({
       isOpen: true,
       title: 'Reset Platform Settings to Default',
-      message: 'This will reset website branding, colors, modules, navigation, and homepage copy to standard NexusTech defaults. Proceed?',
+      message: 'This will reset website branding, colors, modules, navigation, and homepage copy to standard TesfayeTech defaults. Proceed?',
       confirmAction: async () => {
         if (!user) return;
         setFormSettings(DEFAULT_SETTINGS);
@@ -408,7 +408,7 @@ export function AdminDashboard({
     if (templateKey === 'consultant') {
       setFormSettings({
         ...formSettings,
-        siteTitle: 'NexusTech Consulting',
+        siteTitle: 'TesfayeTech Consulting',
         tagline: 'Enterprise Cloud Architecture & Advisory',
         heroHeading: 'Enterprise Cloud Architecture & Advisory',
         heroSubheading: 'Specialized infrastructure engineering, Zero-Trust security postures, and incident response readiness.',
@@ -438,7 +438,7 @@ export function AdminDashboard({
     } else if (templateKey === 'knowledge_base') {
       setFormSettings({
         ...formSettings,
-        siteTitle: 'NexusTech Knowledge Base',
+        siteTitle: 'TesfayeTech Knowledge Base',
         tagline: 'Engineering Manuals & Sev-1 Runbooks',
         heroHeading: 'Definitive IT Runbooks & System Manuals',
         heroSubheading: 'Battle-tested operational playbooks, disaster recovery procedures, and infrastructure documentation for engineering teams.',
@@ -465,7 +465,7 @@ export function AdminDashboard({
     } else if (templateKey === 'solutions_code') {
       setFormSettings({
         ...formSettings,
-        siteTitle: 'NexusTech Solutions & Code',
+        siteTitle: 'TesfayeTech Solutions & Code',
         tagline: 'Production Code, IaC & Automation Tooling',
         heroHeading: 'Production IaC & DevOps Automation Code',
         heroSubheading: 'Drop-in Terraform modules, Bash automation suites, and CI/CD pipeline blueprints tested for enterprise compliance.',
@@ -490,7 +490,7 @@ export function AdminDashboard({
     } else if (templateKey === 'academy') {
       setFormSettings({
         ...formSettings,
-        siteTitle: 'NexusTech Academy',
+        siteTitle: 'TesfayeTech Academy',
         tagline: 'Masterclasses & Technical Certifications',
         heroHeading: 'Advanced Enterprise IT Courses & Tutorials',
         heroSubheading: 'In-depth masterclasses, hands-on lab runbooks, and certification preparation for senior engineers.',
@@ -556,7 +556,7 @@ export function AdminDashboard({
       <div className="bg-[#101C32] text-white rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-400">
-            <Shield size={14} /> NexusTech Central Administration
+            <Shield size={14} /> TesfayeTech Central Administration
           </div>
           <h1 className="text-2xl sm:text-3xl font-black">Platform Management Console</h1>
           <p className="text-xs text-slate-400">
@@ -732,7 +732,7 @@ export function AdminDashboard({
                 {
                   id: 'default',
                   title: 'Full Platform',
-                  subtitle: 'NexusTech All-in-One Hub',
+                  subtitle: 'TesfayeTech All-in-One Hub',
                   icon: Globe,
                   desc: 'All 8 modules enabled, balanced resources & consulting.',
                 },
@@ -819,7 +819,7 @@ export function AdminDashboard({
             <button
               onClick={promptResetSettings}
               className="px-3 py-1.5 text-xs text-slate-500 hover:text-rose-600 flex items-center gap-1 cursor-pointer transition-colors"
-              title="Reset all settings to NexusTech defaults"
+              title="Reset all settings to TesfayeTech defaults"
             >
               <RotateCcw size={12} /> Reset to Defaults
             </button>
@@ -1041,7 +1041,7 @@ export function AdminDashboard({
                       <label className="block font-semibold mb-1">Lead Expert / Organization Name</label>
                       <input
                         type="text"
-                        placeholder="e.g. Marcus Vance or NexusTech Advisory"
+                        placeholder="e.g. Marcus Vance or TesfayeTech Advisory"
                         value={formSettings.expertName || ''}
                         onChange={(e) => setFormSettings({ ...formSettings, expertName: e.target.value })}
                         className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850"
@@ -1541,13 +1541,13 @@ export function AdminDashboard({
                   content: '## Overview\n\n### Requirements\n\n### Step-by-Step Instructions\n\n```bash\n# code here\n```\n',
                   category: formSettings.categories[0] || 'Security & DevOps',
                   resourceType: 'solution',
-                  tags: ['NexusTech', 'Security'],
+                  tags: ['TesfayeTech', 'Security'],
                   fileName: 'runbook.sh',
                   fileType: 'SCRIPT',
                   fileSize: '500 KB',
                   fileData: '#!/usr/bin/env bash\necho "Running script..."\n',
                   version: '1.0.0',
-                  author: userProfile?.fullName || 'NexusTech Author',
+                  author: userProfile?.fullName || 'TesfayeTech Author',
                   visibility: 'members_only',
                   status: 'published',
                   downloadCount: 0,

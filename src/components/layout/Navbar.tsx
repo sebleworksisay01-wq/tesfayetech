@@ -93,7 +93,7 @@ export function Navbar({ currentPath, onNavigate, siteSettings }: NavbarProps) {
             {siteSettings.logoUrl ? (
               <img
                 src={siteSettings.logoUrl}
-                alt={siteSettings.siteTitle || 'NexusTech'}
+                alt={siteSettings.siteTitle || 'TesfayeTech'}
                 className="w-10 h-10 rounded-lg object-contain bg-slate-900 border border-slate-700"
               />
             ) : (
@@ -103,7 +103,7 @@ export function Navbar({ currentPath, onNavigate, siteSettings }: NavbarProps) {
             )}
             <div>
               <span className="font-extrabold text-lg tracking-tight text-white flex items-center gap-1.5">
-                {siteSettings.logoText || siteSettings.siteTitle || 'NexusTech'}
+                {siteSettings.logoText || siteSettings.siteTitle || 'TesfayeTech'}
               </span>
               <p className="text-[10px] text-slate-300 font-medium tracking-wide">
                 {siteSettings.tagline || 'Technology, Knowledge, Solutions.'}

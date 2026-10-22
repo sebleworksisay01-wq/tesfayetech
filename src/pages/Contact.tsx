@@ -203,7 +203,7 @@ export function Contact({ siteSettings }: ContactProps) {
                 <Mail size={16} className="text-blue-500 shrink-0 mt-0.5" />
                 <div>
                   <div className="font-semibold text-slate-900 dark:text-white">Email Consultation</div>
-                  <div>{siteSettings.contactEmail || 'expert@nexustech-hub.com'}</div>
+                  <div>{siteSettings.contactEmail || 'expert@tesfayetech-hub.com'}</div>
                 </div>
               </div>
 

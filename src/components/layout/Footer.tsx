@@ -23,7 +23,7 @@ export function Footer({ onNavigate, siteSettings }: FooterProps) {
               {siteSettings.logoUrl ? (
                 <img
                   src={siteSettings.logoUrl}
-                  alt={siteSettings.siteTitle || 'NexusTech'}
+                  alt={siteSettings.siteTitle || 'TesfayeTech'}
                   className="w-9 h-9 rounded-lg object-contain bg-slate-900 border border-slate-700"
                 />
               ) : (
@@ -33,7 +33,7 @@ export function Footer({ onNavigate, siteSettings }: FooterProps) {
               )}
               <div>
                 <span className="font-extrabold text-lg text-white">
-                  {siteSettings.logoText || siteSettings.siteTitle || 'NexusTech'}
+                  {siteSettings.logoText || siteSettings.siteTitle || 'TesfayeTech'}
                 </span>
                 <p className="text-[10px] text-slate-400 font-medium">
                   {siteSettings.tagline || 'Technology, Knowledge, Solutions.'}
@@ -42,7 +42,7 @@ export function Footer({ onNavigate, siteSettings }: FooterProps) {
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
               {siteSettings.footerText ||
-                'NexusTech — Technology, Knowledge, Solutions. Professional multipurpose technology platform for IT experts, consultants, and enterprise knowledge sharing.'}
+                'TesfayeTech — Technology, Knowledge, Solutions. Professional multipurpose technology platform for IT experts, consultants, and enterprise knowledge sharing.'}
             </p>
             <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-950/40 border border-emerald-800/60 px-2.5 py-1 rounded-md w-fit">
               <ShieldCheck size={14} /> Production Enterprise Verified
@@ -151,7 +151,7 @@ export function Footer({ onNavigate, siteSettings }: FooterProps) {
             <div className="space-y-2.5 text-xs text-slate-400">
               <div className="flex items-center gap-2">
                 <Mail size={14} className="text-blue-400 shrink-0" />
-                <span>{siteSettings.contactEmail || 'contact@nexustech.io'}</span>
+                <span>{siteSettings.contactEmail || 'contact@tesfayetech.io'}</span>
               </div>
               {siteSettings.contactPhone && (
                 <div className="flex items-center gap-2">
@@ -166,7 +166,7 @@ export function Footer({ onNavigate, siteSettings }: FooterProps) {
                 </div>
               )}
               <p className="text-[11px] text-slate-500 pt-2 border-t border-slate-800">
-                NexusTech provides centralized role-based controls and cryptographic integrity for enterprise knowledge assets.
+                TesfayeTech provides centralized role-based controls and cryptographic integrity for enterprise knowledge assets.
               </p>
             </div>
           </div>
@@ -175,7 +175,7 @@ export function Footer({ onNavigate, siteSettings }: FooterProps) {
         {/* Bottom Bar */}
         <div className="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <p>
-            © {new Date().getFullYear()} {siteSettings.siteTitle || 'NexusTech'}. {siteSettings.tagline || 'Technology, Knowledge, Solutions.'} All rights reserved.
+            © {new Date().getFullYear()} {siteSettings.siteTitle || 'TesfayeTech'}. {siteSettings.tagline || 'Technology, Knowledge, Solutions.'} All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <span className="text-slate-500">Multipurpose Platform v4.0</span>

@@ -79,7 +79,7 @@ export function VerifyEmail({ onNavigate, emailParam }: VerifyEmailProps) {
             <ShieldAlert size={15} className="text-blue-500" /> Next Steps:
           </div>
           <ol className="list-decimal pl-4 space-y-1 text-[11px] leading-relaxed">
-            <li>Check your email inbox for an email from <strong>NexusTech / Firebase</strong>.</li>
+            <li>Check your email inbox for an email from <strong>TesfayeTech / Firebase</strong>.</li>
             <li>Click the verification link provided inside the email.</li>
             <li>Once confirmed in your browser, return here and click <strong>&ldquo;I Have Verified My Email&rdquo;</strong> below.</li>
           </ol>

@@ -87,7 +87,7 @@ export function ResourceDetails({
 
     try {
       // Create download blob
-      const contentToDownload = resource.fileData || `# ${resource.title}\nVersion: ${resource.version}\nAuthor: ${resource.author}\nDate: ${resource.createdAt}\nLicense: ${resource.license || 'NexusTech Member License'}\n\n${resource.content}`;
+      const contentToDownload = resource.fileData || `# ${resource.title}\nVersion: ${resource.version}\nAuthor: ${resource.author}\nDate: ${resource.createdAt}\nLicense: ${resource.license || 'TesfayeTech Member License'}\n\n${resource.content}`;
       const blob = new Blob([contentToDownload], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -294,7 +294,7 @@ export function ResourceDetails({
               <div className="flex justify-between text-slate-600 dark:text-slate-300">
                 <span>License:</span>
                 <span className="font-medium text-slate-700 dark:text-slate-300 truncate max-w-[150px]">
-                  {resource.license || 'NexusTech Standard'}
+                  {resource.license || 'TesfayeTech Standard'}
                 </span>
               </div>
               <div className="flex justify-between text-slate-600 dark:text-slate-300">

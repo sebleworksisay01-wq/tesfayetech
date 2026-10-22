@@ -25,7 +25,7 @@ export function ResetPassword({ onNavigate }: ResetPasswordProps) {
             <ShieldCheck size={16} className="text-emerald-500" /> Instructions:
           </div>
           <p className="text-[11px] leading-relaxed">
-            1. Open the email message with subject <em>&ldquo;Reset your password for NexusTech&rdquo;</em> in your mail client.
+            1. Open the email message with subject <em>&ldquo;Reset your password for TesfayeTech&rdquo;</em> in your mail client.
           </p>
           <p className="text-[11px] leading-relaxed">
             2. Click the secure cryptographic link to specify your new password on the Firebase secure portal.

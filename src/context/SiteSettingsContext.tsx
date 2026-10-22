@@ -79,7 +79,7 @@ export function SiteSettingsProvider({ children }: { children: React.ReactNode }
       if (user) {
         await saveSiteSettings(DEFAULT_SETTINGS, user.uid, user.email || 'admin');
       }
-      return { success: true, message: 'Platform settings reset to default NexusTech configuration.' };
+      return { success: true, message: 'Platform settings reset to default TesfayeTech configuration.' };
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to reset settings.';
       return { success: false, message: msg };

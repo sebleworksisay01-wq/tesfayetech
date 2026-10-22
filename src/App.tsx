@@ -171,7 +171,7 @@ function AppContent() {
         <div className="min-h-[60vh] flex items-center justify-center text-sm text-slate-500">
           <div className="flex items-center gap-3">
             <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-            <span>Loading {siteSettings.siteTitle || 'NexusTech'}...</span>
+            <span>Loading {siteSettings.siteTitle || 'TesfayeTech'}...</span>
           </div>
         </div>
       );

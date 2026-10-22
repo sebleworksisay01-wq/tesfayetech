@@ -34,7 +34,7 @@ export function AboutExpert({ onNavigate, siteSettings }: AboutExpertProps) {
     {
       period: '2020 — Present',
       role: 'Principal Cloud & Zero-Trust Infrastructure Architect',
-      org: `${siteSettings.siteTitle || 'NexusTech'} Enterprise Practice`,
+      org: `${siteSettings.siteTitle || 'TesfayeTech'} Enterprise Practice`,
       summary: 'Advises Fortune 500 banks, healthcare networks, and SaaS providers on container security posture, automated compliance, and multi-region disaster recovery.',
     },
     {
@@ -57,7 +57,7 @@ export function AboutExpert({ onNavigate, siteSettings }: AboutExpertProps) {
       <div className="bg-[#101C32] text-white rounded-3xl p-8 sm:p-12 border border-slate-800 shadow-xl relative overflow-hidden">
         <div className="max-w-3xl space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-900/60 border border-blue-700 text-[#55D6FF] text-xs font-semibold">
-            <ShieldCheck size={14} /> {siteSettings.siteTitle || 'NexusTech'} Principal Practice
+            <ShieldCheck size={14} /> {siteSettings.siteTitle || 'TesfayeTech'} Principal Practice
           </div>
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight">
             {siteSettings.expertName || 'Marcus Vance'}
@@ -67,7 +67,7 @@ export function AboutExpert({ onNavigate, siteSettings }: AboutExpertProps) {
           </p>
           <p className="text-sm text-slate-400 leading-relaxed max-w-2xl">
             {siteSettings.expertBio ||
-              `${siteSettings.siteTitle || 'NexusTech'} provides an adaptable platform connecting enterprise engineers with battle-tested architectures, automated runbooks, and high-availability systems engineering.`}
+              `${siteSettings.siteTitle || 'TesfayeTech'} provides an adaptable platform connecting enterprise engineers with battle-tested architectures, automated runbooks, and high-availability systems engineering.`}
           </p>
 
           <div className="pt-2 flex flex-wrap gap-3">
@@ -98,7 +98,7 @@ export function AboutExpert({ onNavigate, siteSettings }: AboutExpertProps) {
         <div className="text-center max-w-2xl mx-auto">
           <h2 className="text-2xl font-black text-slate-900 dark:text-white">Engineering Philosophy</h2>
           <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-            Core principles embedded in every runbook, script, and architecture published on {siteSettings.siteTitle || 'NexusTech'}.
+            Core principles embedded in every runbook, script, and architecture published on {siteSettings.siteTitle || 'TesfayeTech'}.
           </p>
         </div>
 
@@ -129,7 +129,7 @@ export function AboutExpert({ onNavigate, siteSettings }: AboutExpertProps) {
             </div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">Production-Tested Realism</h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Every playbook on {siteSettings.siteTitle || 'NexusTech'} has been executed during real-world Severity-1 incidents. No theoretical academic exercises; only scripts proven under live enterprise loads.
+              Every playbook on {siteSettings.siteTitle || 'TesfayeTech'} has been executed during real-world Severity-1 incidents. No theoretical academic exercises; only scripts proven under live enterprise loads.
             </p>
           </div>
         </div>

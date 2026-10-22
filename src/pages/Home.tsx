@@ -371,7 +371,7 @@ export function Home({
             </h3>
 
             <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-xl mx-auto leading-relaxed">
-              Create an account on {siteSettings.siteTitle || 'NexusTech'} to access protected PowerShell modules, disaster recovery runbooks, Terraform templates, and member bookmarks.
+              Create an account on {siteSettings.siteTitle || 'TesfayeTech'} to access protected PowerShell modules, disaster recovery runbooks, Terraform templates, and member bookmarks.
             </p>
 
             <button

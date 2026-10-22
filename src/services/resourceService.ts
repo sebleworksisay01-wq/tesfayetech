@@ -16,9 +16,9 @@ import { Resource, UserBookmark, UserDownload, SiteSettings, AuditLog, ContactMe
 import { SEED_RESOURCES } from '../data/seedResources';
 
 export const DEFAULT_SETTINGS: SiteSettings = {
-  siteTitle: 'NexusTech',
+  siteTitle: 'TesfayeTech',
   tagline: 'Technology, Knowledge, Solutions.',
-  logoText: 'NexusTech',
+  logoText: 'TesfayeTech',
   logoUrl: '',
   favicon: '',
   primaryColor: '#101C32',
@@ -26,12 +26,12 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   accentColor: '#55D6FF',
   typography: 'Inter / Sans-Serif',
   themePreference: 'system',
-  footerText: 'NexusTech — Technology, Knowledge, Solutions. Multipurpose enterprise knowledge repository and solutions hub.',
+  footerText: 'TesfayeTech — Technology, Knowledge, Solutions. Multipurpose enterprise knowledge repository and solutions hub.',
   expertName: 'Marcus Vance',
   expertTitle: 'Principal Cloud Architect & Systems Security Engineer',
   expertBio: 'Over 15 years advising enterprise engineering teams on cloud-native security, Kubernetes zero-trust, and high-availability operations.',
   expertAvatarUrl: '',
-  contactEmail: 'contact@nexustech.io',
+  contactEmail: 'contact@tesfayetech.io',
   contactPhone: '+1 (555) 019-2834',
   contactLocation: 'Global Technology Operations & Advisory',
   socialLinks: {
@@ -149,7 +149,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
       author: 'David Thorne',
       role: 'VP of Infrastructure Engineering',
       company: 'Apex Financial Technologies',
-      quote: 'NexusTech blueprints saved our engineering team weeks of work during our Kubernetes Zero-Trust hardening cycle. Pure production gold.',
+      quote: 'TesfayeTech blueprints saved our engineering team weeks of work during our Kubernetes Zero-Trust hardening cycle. Pure production gold.',
       rating: 5,
     },
     {
@@ -189,7 +189,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   ],
   featuredResourceIds: ['res-k8s-hardening', 'res-core-switch-dr', 'res-ad-kerberos', 'res-aws-multiaz-vpc'],
   defaultLanguage: 'English (US)',
-  seoTitle: 'NexusTech — Technology, Knowledge, Solutions.',
+  seoTitle: 'TesfayeTech — Technology, Knowledge, Solutions.',
   seoDescription: 'Enterprise technology platform for IT experts, consultants, systems administrators, and software solution providers.',
   registrationEnabled: true,
   allowPublicDownloads: true,
