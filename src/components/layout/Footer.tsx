@@ -1,6 +1,7 @@
 import React from 'react';
 import { Cpu, ShieldCheck, Mail, MapPin, Phone, Github, Linkedin, Twitter, Youtube, ExternalLink } from 'lucide-react';
 import { SiteSettings } from '../../types';
+import { TelebirrLogo } from '../common/TelebirrLogo';
 
 interface FooterProps {
   onNavigate: (path: string, params?: Record<string, string>) => void;
@@ -174,11 +175,27 @@ export function Footer({ onNavigate, siteSettings }: FooterProps) {
 
         {/* Bottom Bar */}
         <div className="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <p>
-            © {new Date().getFullYear()} {siteSettings.siteTitle || 'TesfayeTech'}. {siteSettings.tagline || 'Technology, Knowledge, Solutions.'} All rights reserved.
-          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <p>
+              © {new Date().getFullYear()} {siteSettings.siteTitle || 'TesfayeTech'}. All rights reserved.
+            </p>
+            <div className="h-3 w-px bg-slate-700 hidden sm:block" />
+            <button
+              onClick={() => onNavigate('/pay')}
+              className="inline-flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer text-slate-300"
+              title="Official Ethiopian mobile payment powered by Ethio Telecom"
+            >
+              <span className="text-[11px] text-slate-400">Accepted:</span>
+              <TelebirrLogo size="sm" showSubtitle={false} />
+            </button>
+          </div>
           <div className="flex items-center gap-6">
-            <span className="text-slate-500">Multipurpose Platform v4.0</span>
+            <button
+              onClick={() => onNavigate('/pay')}
+              className="text-[#00B5E2] font-semibold hover:underline cursor-pointer"
+            >
+              Pay Invoice (Telebirr)
+            </button>
             <button
               onClick={() => onNavigate('/about')}
               className="hover:text-white transition-colors cursor-pointer"

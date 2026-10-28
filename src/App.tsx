@@ -27,6 +27,10 @@ import { UserProfilePage } from './pages/UserProfilePage';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { NotFound } from './pages/NotFound';
 import { TestChecklist } from './pages/TestChecklist';
+import { CheckoutPage } from './pages/CheckoutPage';
+import { PaymentResultPage } from './pages/PaymentResultPage';
+import { TelebirrGatewaySimulator } from './pages/TelebirrGatewaySimulator';
+
 
 // Services & Data
 import { Resource, SiteSettings } from './types';
@@ -304,6 +308,13 @@ function AppContent() {
         );
       case '/test-checklist':
         return <TestChecklist onNavigate={navigate} />;
+      case '/pay':
+      case '/checkout':
+        return <CheckoutPage siteSettings={siteSettings} onNavigate={navigate} />;
+      case '/payment-result':
+        return <PaymentResultPage onNavigate={navigate} />;
+      case '/telebirr-gateway':
+        return <TelebirrGatewaySimulator onNavigate={navigate} />;
       default:
         return <NotFound onNavigate={navigate} />;
     }

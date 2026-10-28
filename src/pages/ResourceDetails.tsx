@@ -23,6 +23,9 @@ import { FileIcon } from '../components/common/FileIcon';
 import { ResourceCard } from '../components/common/ResourceCard';
 import { useAuth } from '../context/AuthContext';
 import { recordUserDownload, incrementResourceDownload } from '../services/resourceService';
+import { TelebirrLogo } from '../components/common/TelebirrLogo';
+import { TelebirrCheckoutModal } from '../components/payment/TelebirrCheckoutModal';
+
 
 interface ResourceDetailsProps {
   resourceId: string;
@@ -43,6 +46,7 @@ export function ResourceDetails({
   const [copied, setCopied] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   const resource = resources.find((r) => r.id === resourceId);
 
@@ -364,6 +368,16 @@ export function ResourceDetails({
               )}
             </button>
 
+            {/* Commercial Enterprise License with Telebirr */}
+            <button
+              type="button"
+              onClick={() => setCheckoutOpen(true)}
+              className="w-full py-3 px-4 rounded-xl border border-[#00B5E2]/40 bg-cyan-950/20 hover:bg-cyan-950/40 text-cyan-300 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+            >
+              <TelebirrLogo size="sm" showSubtitle={false} variant="icon-only" />
+              <span>Get Commercial License (850 ETB)</span>
+            </button>
+
             {isMembersOnly && !user && (
               <p className="text-[11px] text-center text-slate-500">
                 Requires free registered account with verified email address.
@@ -381,6 +395,19 @@ export function ResourceDetails({
               </a>
             )}
           </div>
+
+          {/* Checkout Modal */}
+          {checkoutOpen && (
+            <TelebirrCheckoutModal
+              isOpen={checkoutOpen}
+              onClose={() => setCheckoutOpen(false)}
+              title={`Commercial License: ${resource.title}`}
+              description={`Commercial deployment rights and source code package for ${resource.fileName}.`}
+              amount={850}
+              itemType="resource"
+              itemId={resource.id}
+            />
+          )}
 
           {/* Related Resources */}
           {relatedResources.length > 0 && (

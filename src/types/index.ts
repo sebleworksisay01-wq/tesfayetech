@@ -179,3 +179,6 @@ export interface ContactMessage {
   status: 'unread' | 'replied' | 'archived';
   createdAt: string;
 }
+
+export * from './payment';
+

@@ -19,10 +19,12 @@ import {
   ChevronDown,
   LayoutDashboard,
   Cpu,
+  CreditCard,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { SiteSettings, PlatformModule } from '../../types';
+import { TelebirrLogo } from '../common/TelebirrLogo';
 
 interface NavbarProps {
   currentPath: string;
@@ -171,6 +173,19 @@ export function Navbar({ currentPath, onNavigate, siteSettings }: NavbarProps) {
                 )}
               </div>
             )}
+
+            {/* Direct Pay with Telebirr button */}
+            <button
+              onClick={() => handleLinkClick('/pay')}
+              className={`ml-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                currentPath === '/pay' || currentPath === '/checkout'
+                  ? 'bg-[#00B5E2] text-white shadow-md'
+                  : 'text-cyan-300 hover:text-white bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/40'
+              }`}
+            >
+              <TelebirrLogo size="sm" showSubtitle={false} variant="icon-only" />
+              <span>Pay with Telebirr</span>
+            </button>
           </nav>
 
           {/* Right Action Icons & Auth Controls */}
@@ -217,6 +232,13 @@ export function Navbar({ currentPath, onNavigate, siteSettings }: NavbarProps) {
                       className="w-full text-left px-4 py-2 text-sm text-slate-200 hover:text-white hover:bg-slate-800 flex items-center gap-2 cursor-pointer"
                     >
                       <LayoutDashboard size={16} className="text-blue-400" /> Member Dashboard
+                    </button>
+
+                    <button
+                      onClick={() => handleLinkClick('/pay')}
+                      className="w-full text-left px-4 py-2 text-sm text-cyan-300 hover:text-cyan-200 hover:bg-slate-800 flex items-center gap-2 cursor-pointer font-semibold"
+                    >
+                      <CreditCard size={16} className="text-[#00B5E2]" /> Pay with Telebirr
                     </button>
 
                     <button
@@ -319,6 +341,12 @@ export function Navbar({ currentPath, onNavigate, siteSettings }: NavbarProps) {
           })}
 
           <div className="border-t border-slate-800 pt-3">
+            <button
+              onClick={() => handleLinkClick('/pay')}
+              className="w-full text-left px-3 py-2 text-sm text-cyan-300 font-bold bg-cyan-950/50 border border-cyan-500/30 rounded-lg flex items-center gap-2 mb-2"
+            >
+              <TelebirrLogo size="sm" showSubtitle={false} variant="icon-only" /> Pay with Telebirr (ETB)
+            </button>
             {user ? (
               <div className="space-y-2">
                 <button

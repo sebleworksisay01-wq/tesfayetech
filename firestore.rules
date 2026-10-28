@@ -156,5 +156,33 @@ service cloud.firestore {
                     incoming().message is string && incoming().message.size() > 0 && incoming().message.size() <= 3000;
       allow read, update, delete: if isAdmin();
     }
+
+    // 7. Telebirr Payments Collection (Audited & Hardened)
+    match /payments/{paymentId} {
+      // Members can read only their own payments; Admins can read all payments
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (
+        isAdmin() ||
+        (request.query.limit <= 100 && resource.data.userId == request.auth.uid)
+      );
+
+      // Members can only create initial PENDING records for themselves with valid ETB amounts
+      allow create: if isSignedIn() && (
+        isAdmin() ||
+        (
+          incoming().userId == request.auth.uid &&
+          incoming().status in ['PENDING', 'PROCESSING'] &&
+          incoming().amount is number &&
+          incoming().amount > 0 &&
+          incoming().currency == 'ETB' &&
+          incoming().provider == 'telebirr'
+        )
+      );
+
+      // Status updates (marking SUCCESS, adding transaction ID) are strictly restricted to admin / backend
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
   }
 }
+

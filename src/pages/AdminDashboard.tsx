@@ -35,6 +35,10 @@ import {
   Briefcase,
   BookOpen,
   FolderOpen,
+  CreditCard,
+  FileDown,
+  RefreshCw,
+  Printer,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -49,8 +53,11 @@ import {
   PublicationStatus,
   PlatformModule,
 } from '../types';
+import { PaymentRecord } from '../types/payment';
 import { Badge } from '../components/common/Badge';
 import { ConfirmationModal } from '../components/common/ConfirmationModal';
+import { TelebirrLogo } from '../components/common/TelebirrLogo';
+import { ReceiptModal } from '../components/payment/ReceiptModal';
 import {
   saveResource,
   removeResource,
@@ -62,6 +69,11 @@ import {
   DEFAULT_SETTINGS,
 } from '../services/resourceService';
 import { getAllUsers, updateUserStatus, updateUserRole } from '../services/userService';
+import {
+  getAdminPayments,
+  recheckAdminPayment,
+  markManualPaymentVerified,
+} from '../services/paymentService';
 
 interface AdminDashboardProps {
   resources: Resource[];
@@ -80,12 +92,32 @@ export function AdminDashboard({
 }: AdminDashboardProps) {
   const { user, isAdmin, userProfile } = useAuth();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'resources' | 'users' | 'settings' | 'audit' | 'inquiries'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'resources' | 'users' | 'settings' | 'audit' | 'inquiries' | 'payments'>('overview');
   const [settingsSubTab, setSettingsSubTab] = useState<'branding' | 'modules' | 'homepage' | 'general'>('branding');
 
   const [usersList, setUsersList] = useState<UserProfile[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [inquiries, setInquiries] = useState<ContactMessage[]>([]);
+  const [adminPayments, setAdminPayments] = useState<PaymentRecord[]>([]);
+  const [paymentAnalytics, setPaymentAnalytics] = useState<{
+    totalRevenueETB: number;
+    totalCount: number;
+    successCount: number;
+    pendingCount: number;
+    failedCount: number;
+    currency: string;
+  }>({
+    totalRevenueETB: 0,
+    totalCount: 0,
+    successCount: 0,
+    pendingCount: 0,
+    failedCount: 0,
+    currency: 'ETB',
+  });
+  const [paymentSearch, setPaymentSearch] = useState('');
+  const [paymentFilter, setPaymentFilter] = useState<'ALL' | 'SUCCESS' | 'PENDING' | 'FAILED'>('ALL');
+  const [selectedReceipt, setSelectedReceipt] = useState<PaymentRecord | null>(null);
+  const [recheckingRef, setRecheckingRef] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [actionMessage, setActionMessage] = useState<{ text: string; error?: boolean } | null>(null);
 
@@ -128,14 +160,19 @@ export function AdminDashboard({
   const loadData = async () => {
     setLoading(true);
     try {
-      const [uList, logs, msgs] = await Promise.all([
+      const [uList, logs, msgs, pData] = await Promise.all([
         getAllUsers(),
         getAuditLogs(),
         getContactMessages(),
+        getAdminPayments().catch(() => null),
       ]);
       setUsersList(uList);
       setAuditLogs(logs);
       setInquiries(msgs);
+      if (pData) {
+        setAdminPayments(pData.payments);
+        setPaymentAnalytics(pData.analytics);
+      }
     } catch (err) {
       console.warn('Error loading admin tables:', err);
     } finally {
@@ -601,6 +638,7 @@ export function AdminDashboard({
       <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 text-xs font-bold">
         {[
           { id: 'overview', label: 'Overview Metrics', icon: Layers },
+          { id: 'payments', label: `Telebirr Revenue (${adminPayments.length})`, icon: CreditCard },
           { id: 'settings', label: 'Platform & Website Settings', icon: Settings },
           { id: 'resources', label: `Resources (${resources.length})`, icon: FileCode2 },
           { id: 'users', label: `User Accounts (${usersList.length})`, icon: Users },
@@ -631,11 +669,22 @@ export function AdminDashboard({
       {/* TAB 1: OVERVIEW */}
       {activeTab === 'overview' && (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
+              <div className="text-xs font-medium text-slate-500">Telebirr Total Revenue</div>
+              <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                {paymentAnalytics.totalRevenueETB.toLocaleString()}{' '}
+                <span className="text-xs font-extrabold text-[#00B5E2]">ETB</span>
+              </div>
+              <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-2 font-medium">
+                {paymentAnalytics.successCount} Settled Orders
+              </div>
+            </div>
+
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
               <div className="text-xs font-medium text-slate-500">Configured Platform Name</div>
-              <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{formSettings.siteTitle}</div>
-              <div className="text-[11px] text-blue-600 dark:text-cyan-400 mt-2 font-medium">{formSettings.tagline}</div>
+              <div className="text-2xl font-black text-slate-900 dark:text-white mt-1 truncate">{formSettings.siteTitle}</div>
+              <div className="text-[11px] text-blue-600 dark:text-cyan-400 mt-2 font-medium truncate">{formSettings.tagline}</div>
             </div>
 
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
@@ -1983,6 +2032,267 @@ export function AdminDashboard({
             ))}
           </div>
         </div>
+      )}
+
+      {/* TAB 7: TELEBIRR PAYMENTS MANAGEMENT & AUDITING */}
+      {activeTab === 'payments' && (
+        <div className="space-y-6">
+          {/* Revenue Analytics Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
+              <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
+                <span>Total Settled Revenue</span>
+                <span className="p-1 rounded-md bg-cyan-100 dark:bg-cyan-950 text-[#00B5E2]">
+                  <CreditCard size={14} />
+                </span>
+              </div>
+              <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                {paymentAnalytics.totalRevenueETB.toLocaleString(undefined, { minimumFractionDigits: 2 })}{' '}
+                <span className="text-xs font-extrabold text-[#00B5E2]">ETB</span>
+              </div>
+              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-2 font-semibold">
+                ✓ Cryptographically Verified
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
+              <div className="text-xs font-semibold text-slate-500">Completed Transactions</div>
+              <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
+                {paymentAnalytics.successCount}
+              </div>
+              <p className="text-[11px] text-slate-400 mt-2">Paid via Telebirr Wallet</p>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
+              <div className="text-xs font-semibold text-slate-500">Pending Authorization</div>
+              <div className="text-2xl font-black text-cyan-600 dark:text-cyan-400 mt-1">
+                {paymentAnalytics.pendingCount}
+              </div>
+              <p className="text-[11px] text-slate-400 mt-2">Awaiting Customer PIN</p>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
+              <div className="text-xs font-semibold text-slate-500">Cancelled / Failed</div>
+              <div className="text-2xl font-black text-slate-500 mt-1">
+                {paymentAnalytics.failedCount}
+              </div>
+              <p className="text-[11px] text-slate-400 mt-2">Zero Client Charges</p>
+            </div>
+          </div>
+
+          {/* Action Bar & Filters */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="flex flex-1 items-center gap-3">
+              <div className="relative flex-1 max-w-sm">
+                <Search size={14} className="absolute left-3 top-3 text-slate-400" />
+                <input
+                  type="text"
+                  value={paymentSearch}
+                  onChange={(e) => setPaymentSearch(e.target.value)}
+                  placeholder="Search by order ref, customer, phone, or title..."
+                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-[#00B5E2] outline-none"
+                />
+              </div>
+
+              <select
+                value={paymentFilter}
+                onChange={(e) => setPaymentFilter(e.target.value as any)}
+                className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-semibold outline-none"
+              >
+                <option value="ALL">All Statuses ({adminPayments.length})</option>
+                <option value="SUCCESS">Success Only</option>
+                <option value="PENDING">Pending Only</option>
+                <option value="FAILED">Failed / Cancelled</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  // Export CSV
+                  const headers = 'OrderRef,Title,Customer,Phone,Email,AmountETB,Status,TelebirrTradeNo,CreatedAt,PaidAt\n';
+                  const rows = adminPayments
+                    .map((p) =>
+                      [
+                        p.outTradeNo,
+                        `"${p.title.replace(/"/g, '""')}"`,
+                        `"${p.customerName.replace(/"/g, '""')}"`,
+                        p.customerPhone,
+                        p.customerEmail || '',
+                        p.amount,
+                        p.status,
+                        p.telebirrTradeNo || '',
+                        p.createdAt,
+                        p.paidAt || '',
+                      ].join(',')
+                    )
+                    .join('\n');
+                  const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `tesfayetech_telebirr_payments_${new Date().toISOString().slice(0, 10)}.csv`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+                title="Export financial records to CSV"
+              >
+                <FileDown size={14} /> Export CSV
+              </button>
+
+              <button
+                onClick={() => onNavigate('/pay')}
+                className="px-3.5 py-2 rounded-xl bg-[#00B5E2] hover:bg-[#009fc7] text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+              >
+                + Test Checkout
+              </button>
+            </div>
+          </div>
+
+          {/* Payments Table */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="px-5 py-3.5">Order Ref & Title</th>
+                    <th className="px-5 py-3.5">Customer & Phone</th>
+                    <th className="px-5 py-3.5">Amount (ETB)</th>
+                    <th className="px-5 py-3.5">Status</th>
+                    <th className="px-5 py-3.5">Telebirr Trade No</th>
+                    <th className="px-5 py-3.5">Date</th>
+                    <th className="px-5 py-3.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                  {adminPayments
+                    .filter((p) => {
+                      if (paymentFilter === 'SUCCESS' && p.status !== 'SUCCESS') return false;
+                      if (paymentFilter === 'PENDING' && p.status !== 'PENDING' && p.status !== 'PROCESSING') return false;
+                      if (paymentFilter === 'FAILED' && p.status !== 'FAILED' && p.status !== 'CANCELLED' && p.status !== 'EXPIRED') return false;
+                      if (!paymentSearch) return true;
+                      const q = paymentSearch.toLowerCase();
+                      return (
+                        p.outTradeNo.toLowerCase().includes(q) ||
+                        p.title.toLowerCase().includes(q) ||
+                        p.customerName.toLowerCase().includes(q) ||
+                        p.customerPhone.toLowerCase().includes(q) ||
+                        (p.telebirrTradeNo && p.telebirrTradeNo.toLowerCase().includes(q))
+                      );
+                    })
+                    .map((p) => {
+                      const isSuccess = p.status === 'SUCCESS';
+                      const isRechecking = recheckingRef === p.outTradeNo;
+                      return (
+                        <tr key={p.outTradeNo} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                          <td className="px-5 py-3.5">
+                            <div className="font-bold text-slate-900 dark:text-white max-w-xs truncate">{p.title}</div>
+                            <div className="font-mono text-[10px] text-slate-400">{p.outTradeNo}</div>
+                          </td>
+                          <td className="px-5 py-3.5">
+                            <div className="font-semibold text-slate-900 dark:text-white">{p.customerName}</div>
+                            <div className="font-mono text-[10px] text-slate-400">{p.customerPhone}</div>
+                          </td>
+                          <td className="px-5 py-3.5 font-mono font-bold text-slate-900 dark:text-white">
+                            {p.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}{' '}
+                            <span className="text-[10px] text-[#00B5E2]">ETB</span>
+                          </td>
+                          <td className="px-5 py-3.5">
+                            <span
+                              className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                isSuccess
+                                  ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                                  : p.status === 'PENDING' || p.status === 'PROCESSING'
+                                  ? 'bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300'
+                                  : 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300'
+                              }`}
+                            >
+                              {p.status}
+                            </span>
+                          </td>
+                          <td className="px-5 py-3.5 font-mono text-[11px] text-slate-500">
+                            {p.telebirrTradeNo || '—'}
+                          </td>
+                          <td className="px-5 py-3.5 text-slate-500 text-[11px]">
+                            {new Date(p.createdAt).toLocaleDateString()}
+                          </td>
+                          <td className="px-5 py-3.5 text-right space-x-2">
+                            {isSuccess && (
+                              <button
+                                onClick={() => setSelectedReceipt(p)}
+                                className="text-blue-600 dark:text-cyan-400 font-bold hover:underline cursor-pointer"
+                                title="Print Receipt"
+                              >
+                                Receipt
+                              </button>
+                            )}
+                            <button
+                              onClick={async () => {
+                                setRecheckingRef(p.outTradeNo);
+                                try {
+                                  const updated = await recheckAdminPayment(p.outTradeNo);
+                                  setAdminPayments((prev) =>
+                                    prev.map((item) => (item.outTradeNo === p.outTradeNo ? updated : item))
+                                  );
+                                  setActionMessage({ text: `Order ${p.outTradeNo} rechecked with Telebirr server.` });
+                                } catch (e) {
+                                  setActionMessage({ text: 'Recheck failed', error: true });
+                                } finally {
+                                  setRecheckingRef(null);
+                                }
+                              }}
+                              disabled={isRechecking}
+                              className="text-slate-500 hover:text-slate-900 dark:hover:text-white font-semibold cursor-pointer"
+                              title="Recheck order status with Telebirr gateway"
+                            >
+                              {isRechecking ? 'Checking...' : 'Recheck'}
+                            </button>
+                            {!isSuccess && (
+                              <button
+                                onClick={async () => {
+                                  const reason = window.prompt(
+                                    `Manually verify ${p.outTradeNo}? Enter justification for audit log:`
+                                  );
+                                  if (!reason) return;
+                                  try {
+                                    const updated = await markManualPaymentVerified(
+                                      p.outTradeNo,
+                                      user?.email || 'admin',
+                                      reason
+                                    );
+                                    setAdminPayments((prev) =>
+                                      prev.map((item) => (item.outTradeNo === p.outTradeNo ? updated : item))
+                                    );
+                                    setActionMessage({ text: `Order ${p.outTradeNo} manually verified.` });
+                                  } catch (e) {
+                                    setActionMessage({ text: 'Manual verification failed', error: true });
+                                  }
+                                }}
+                                className="text-amber-600 dark:text-amber-400 font-semibold hover:underline cursor-pointer"
+                                title="Manually approve order"
+                              >
+                                Reconcile
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Printable Receipt Modal */}
+      {selectedReceipt && (
+        <ReceiptModal
+          payment={selectedReceipt}
+          isOpen={!!selectedReceipt}
+          onClose={() => setSelectedReceipt(null)}
+        />
       )}
     </div>
   );

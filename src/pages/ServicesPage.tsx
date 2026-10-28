@@ -1,6 +1,7 @@
 import React from 'react';
 import { Briefcase, CheckCircle2, ArrowRight, Shield, Server, Wrench, Clock, FileCheck } from 'lucide-react';
 import { SiteSettings } from '../types';
+import { TelebirrLogo } from '../components/common/TelebirrLogo';
 
 interface ServicesPageProps {
   siteSettings: SiteSettings;
@@ -58,12 +59,19 @@ export function ServicesPage({ siteSettings, onNavigate }: ServicesPageProps) {
           <p className="text-base sm:text-lg text-slate-300 font-medium leading-relaxed">
             Hands-on technical advisory, Zero-Trust network design, and high-availability systems engineering delivered by principal architects.
           </p>
-          <div className="pt-2">
+          <div className="pt-2 flex flex-wrap items-center gap-3">
             <button
               onClick={() => onNavigate('/contact')}
               className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 font-bold text-xs text-white shadow-md transition-colors cursor-pointer flex items-center gap-2"
             >
               Inquire About an Engagement <ArrowRight size={14} />
+            </button>
+            <button
+              onClick={() => onNavigate('/pay')}
+              className="px-6 py-3 rounded-xl bg-[#00B5E2] hover:bg-[#009fc7] font-bold text-xs text-white shadow-md transition-colors cursor-pointer flex items-center gap-2"
+            >
+              <TelebirrLogo size="sm" showSubtitle={false} variant="icon-only" />
+              Pay Retainer via Telebirr
             </button>
           </div>
         </div>

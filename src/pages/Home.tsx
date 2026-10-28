@@ -22,6 +22,8 @@ import {
 import { Resource, SiteSettings, PlatformModule } from '../types';
 import { ResourceCard } from '../components/common/ResourceCard';
 import { useAuth } from '../context/AuthContext';
+import { TelebirrLogo } from '../components/common/TelebirrLogo';
+
 
 interface HomeProps {
   resources: Resource[];
@@ -146,11 +148,15 @@ export function Home({
                   <CheckCircle size={14} className="text-emerald-400" /> Verified Engineering Blueprints
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <CheckCircle size={14} className="text-emerald-400" /> Multipurpose Architecture
-                </span>
-                <span className="flex items-center gap-1.5">
                   <CheckCircle size={14} className="text-emerald-400" /> Enterprise Zero-Trust Security
                 </span>
+                <button
+                  onClick={() => onNavigate('/pay')}
+                  className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 hover:text-white transition-colors cursor-pointer"
+                >
+                  <TelebirrLogo size="sm" showSubtitle={false} variant="icon-only" />
+                  <span>Instant Telebirr Mobile Payments (ETB)</span>
+                </button>
               </div>
             </div>
           </div>

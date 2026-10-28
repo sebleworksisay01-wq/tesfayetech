@@ -16,12 +16,18 @@ import {
   FolderOpen,
   ArrowRight,
   Sparkles,
+  CreditCard,
+  Printer,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Resource, UserDownload } from '../types';
+import { PaymentRecord } from '../types/payment';
 import { ResourceCard } from '../components/common/ResourceCard';
 import { getUserDownloads } from '../services/resourceService';
+import { getMyPayments } from '../services/paymentService';
 import { Badge } from '../components/common/Badge';
+import { TelebirrLogo } from '../components/common/TelebirrLogo';
+import { ReceiptModal } from '../components/payment/ReceiptModal';
 
 interface MemberDashboardProps {
   resources: Resource[];
@@ -38,15 +44,23 @@ export function MemberDashboard({
 }: MemberDashboardProps) {
   const { user, userProfile, isAdmin, resetPassword } = useAuth();
   const [userDownloads, setUserDownloads] = useState<UserDownload[]>([]);
+  const [userPayments, setUserPayments] = useState<PaymentRecord[]>([]);
   const [loadingDownloads, setLoadingDownloads] = useState(true);
+  const [loadingPayments, setLoadingPayments] = useState(true);
+  const [selectedReceipt, setSelectedReceipt] = useState<PaymentRecord | null>(null);
   const [passwordResetNotice, setPasswordResetNotice] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'bookmarks' | 'history'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'bookmarks' | 'history' | 'payments'>('overview');
 
   useEffect(() => {
     if (user) {
       getUserDownloads(user.uid)
         .then((dls) => setUserDownloads(dls))
         .finally(() => setLoadingDownloads(false));
+
+      getMyPayments(user.uid, user.email || undefined)
+        .then((p) => setUserPayments(p))
+        .catch((e) => console.warn('Could not load user payments:', e))
+        .finally(() => setLoadingPayments(false));
     }
   }, [user]);
 
@@ -124,7 +138,7 @@ export function MemberDashboard({
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex items-center gap-4">
           <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-cyan-400">
             <Bookmark size={24} />
@@ -142,6 +156,16 @@ export function MemberDashboard({
           <div>
             <div className="text-2xl font-black text-slate-900 dark:text-white">{userDownloads.length}</div>
             <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Recorded Downloads</div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex items-center gap-4">
+          <div className="p-3 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 text-[#00B5E2]">
+            <CreditCard size={24} />
+          </div>
+          <div>
+            <div className="text-2xl font-black text-slate-900 dark:text-white">{userPayments.length}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Telebirr Orders</div>
           </div>
         </div>
 
@@ -187,6 +211,16 @@ export function MemberDashboard({
           }`}
         >
           Download History ({userDownloads.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('payments')}
+          className={`pb-3 border-b-2 transition-colors cursor-pointer flex items-center gap-2 ${
+            activeTab === 'payments'
+              ? 'border-[#00B5E2] text-[#00B5E2]'
+              : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <TelebirrLogo size="sm" showSubtitle={false} /> My Payments ({userPayments.length})
         </button>
       </div>
 
@@ -369,6 +403,124 @@ export function MemberDashboard({
             </div>
           )}
         </div>
+      )}
+
+      {/* Tab 4: Telebirr Payments */}
+      {activeTab === 'payments' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <TelebirrLogo size="sm" showSubtitle={false} /> Your Telebirr Payment History
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                All retainers, advisory engagements, and digital package purchases authorized via your mobile wallet.
+              </p>
+            </div>
+            <button
+              onClick={() => onNavigate('/pay')}
+              className="px-4 py-2 rounded-xl bg-[#00B5E2] hover:bg-[#009fc7] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+            >
+              + Make New Payment
+            </button>
+          </div>
+
+          {loadingPayments ? (
+            <div className="p-8 text-center text-xs text-slate-500">Loading your transactions...</div>
+          ) : userPayments.length > 0 ? (
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-800">
+                    <tr>
+                      <th className="px-6 py-3.5">Reference & Title</th>
+                      <th className="px-6 py-3.5">Amount (ETB)</th>
+                      <th className="px-6 py-3.5">Status</th>
+                      <th className="px-6 py-3.5">Telebirr Trade No</th>
+                      <th className="px-6 py-3.5">Date</th>
+                      <th className="px-6 py-3.5 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                    {userPayments.map((p) => {
+                      const isSuccess = p.status === 'SUCCESS';
+                      return (
+                        <tr key={p.outTradeNo} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                          <td className="px-6 py-4">
+                            <div className="font-bold text-slate-900 dark:text-white">{p.title}</div>
+                            <div className="font-mono text-[10px] text-slate-400">{p.outTradeNo}</div>
+                          </td>
+                          <td className="px-6 py-4 font-mono font-bold text-slate-900 dark:text-white">
+                            {p.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })} ETB
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                isSuccess
+                                  ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                                  : p.status === 'PENDING'
+                                  ? 'bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300'
+                                  : 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300'
+                              }`}
+                            >
+                              {p.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 font-mono text-slate-500">
+                            {p.telebirrTradeNo || '—'}
+                          </td>
+                          <td className="px-6 py-4 text-slate-500">
+                            {new Date(p.createdAt).toLocaleDateString()}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            {isSuccess ? (
+                              <button
+                                onClick={() => setSelectedReceipt(p)}
+                                className="font-bold text-blue-600 dark:text-cyan-400 hover:underline cursor-pointer inline-flex items-center gap-1"
+                              >
+                                <Printer size={13} /> View Receipt
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => onNavigate('/payment-result', { outTradeNo: p.outTradeNo })}
+                                className="font-bold text-slate-600 dark:text-slate-400 hover:underline cursor-pointer"
+                              >
+                                View Status →
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center text-slate-500 space-y-3">
+              <CreditCard size={32} className="mx-auto text-slate-400" />
+              <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">No Telebirr Payments Recorded</h3>
+              <p className="text-xs max-w-sm mx-auto">
+                When you book consulting retainers or settle invoices via Telebirr, your verified transactions and tax receipts will appear here.
+              </p>
+              <button
+                onClick={() => onNavigate('/pay')}
+                className="px-4 py-2 bg-[#00B5E2] text-white rounded-xl text-xs font-bold hover:bg-[#009fc7] cursor-pointer"
+              >
+                Browse Paid Services & Invoices
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Printable Receipt Modal */}
+      {selectedReceipt && (
+        <ReceiptModal
+          payment={selectedReceipt}
+          isOpen={!!selectedReceipt}
+          onClose={() => setSelectedReceipt(null)}
+        />
       )}
     </div>
   );
